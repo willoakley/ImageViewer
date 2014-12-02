@@ -1,0 +1,11 @@
+﻿---------------------------------------------------------------------------------------------------------
+TODO:
+---------------------------------------------------------------------------------------------------------
+
+Load image in async (status message)
+Load list of other images from directory async (status message, order by most recently modified)
+Left and right arrows to navigate through images (show image X of Y count, update file names)
+Shift key to toggle between zoom and actual size (update zoom display)
+
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
