@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,7 +18,7 @@ namespace ImageViewer
                 return;
             }
 
-            loadInitialImage = Task.Factory.StartNew(() => ImageInfo.LoadFromFile(arguments[0]));
+            loadInitialImage = Task.Factory.StartNew(() => new ImageInfoLoader().FromFile(arguments[0]));
 
             InitializeComponent();
         }
@@ -54,6 +56,9 @@ namespace ImageViewer
 
             initialImage = loadInitialImage.Result;
             DisplayImage(initialImage);
+
+            var allImages = new ImageInfoLoader().ListImagePaths(initialImage.RelativePath);
+            StatusMessagesBox.Text += string.Format(" {0} images", allImages.Count);
         }
 
         private void DisplayImage(ImageInfo imageInfo)

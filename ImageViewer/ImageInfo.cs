@@ -1,25 +1,10 @@
 ﻿using System.Drawing;
-using System.IO;
 
 namespace ImageViewer
 {
     public class ImageInfo
     {
-        public static ImageInfo LoadFromFile(string relativePath)
-        {
-            var fileInfo = new FileInfo(relativePath);
-            var image = Image.FromFile(relativePath);
-
-            return new ImageInfo(image, fileInfo.Name, string.Empty);
-        }
-
-        public static ImageInfo FromImage(Image image, string name)
-        {
-            return new ImageInfo(image, name, string.Empty);
-        }
-
-
-        private ImageInfo(Image image, string name, string relativePath)
+        public ImageInfo(Image image, string name, string relativePath)
         {
             Picture = image;
             Name = string.IsNullOrWhiteSpace(name) ? "noname" : name.Trim();
