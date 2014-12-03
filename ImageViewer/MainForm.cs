@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ImageViewer
 {
     public partial class MainForm : Form
     {
+        private readonly Task<ImageInfo> loadInitialImage;
+        private ImageInfo initialImage;
 
         public MainForm(string[] arguments)
         {
@@ -13,10 +16,9 @@ namespace ImageViewer
                 return;
             }
 
-            InitializeComponent();
+            loadInitialImage = Task.Factory.StartNew(() => ImageInfo.LoadFromFile(arguments[0]));
 
-            var imageInfo = ImageInfo.LoadFromFile(arguments[0]);
-            DisplayImage(imageInfo);
+            InitializeComponent();
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs keyEventArgs)
@@ -44,6 +46,14 @@ namespace ImageViewer
         private void MainForm_Load(object sender, EventArgs eventArgs)
         {
             ImageHolder.Size = Size;
+
+            if (loadInitialImage.IsFaulted)
+            {
+                Quit();
+            }
+
+            initialImage = loadInitialImage.Result;
+            DisplayImage(initialImage);
         }
 
         private void DisplayImage(ImageInfo imageInfo)
