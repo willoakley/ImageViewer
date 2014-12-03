@@ -10,7 +10,7 @@ namespace ImageViewer
             Name = string.IsNullOrWhiteSpace(name) ? "noname" : name.Trim();
             RelativePath = relativePath;
 
-            EdgeColour = GetEdgeColour();
+            EdgeColour = GetEdgeColour(image);
         }
 
 
@@ -41,9 +41,9 @@ namespace ImageViewer
         }
 
 
-        private static Color GetEdgeColour()
+        private static Color GetEdgeColour(Image image)
         {
-            return Color.LightGray;
+            return image.GetBackgroundColour(Color.LightGray);
         }
     }
 }
