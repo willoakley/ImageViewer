@@ -5,7 +5,6 @@ namespace ImageViewer
 {
     public partial class MainForm : Form
     {
-        public bool ImageLoaded { get; private set; }
 
         public MainForm(string[] arguments)
         {
@@ -17,7 +16,6 @@ namespace ImageViewer
             InitializeComponent();
 
             var imageInfo = ImageInfo.LoadFromFile(arguments[0]);
-            ImageLoaded = true;
             DisplayImage(imageInfo);
         }
 

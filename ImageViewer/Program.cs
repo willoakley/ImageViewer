@@ -10,14 +10,7 @@ namespace ImageViewer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
-            var mainForm = new MainForm(arguments);
-            if (!mainForm.ImageLoaded)
-            {
-                return;
-            }
-
-            Application.Run(mainForm);
+            Application.Run(new MainForm(arguments));
         }
     }
 }
