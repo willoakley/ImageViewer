@@ -42,7 +42,7 @@ namespace ImageViewer
                 return 0;
             }
 
-            var scalledDecimal = (IsWider ? ((float)Picture.Width / sizeLimit.Width) : ((float)Picture.Height / sizeLimit.Height));
+            var scalledDecimal = (IsWider ? ((float)sizeLimit.Width / Picture.Width) : ((float)sizeLimit.Height / Picture.Height));
             return (int)(100 * scalledDecimal);
         }
 
