@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Drawing;
-using System.IO;
 using System.Windows.Forms;
 
 namespace ImageViewer
 {
     public partial class MainForm : Form
     {
+        public bool ImageLoaded { get; private set; }
+
         public MainForm(string[] arguments)
         {
             if (arguments == null || string.IsNullOrEmpty(arguments[0]))
@@ -16,15 +16,9 @@ namespace ImageViewer
 
             InitializeComponent();
 
-            try
-            {
-                var fileInfo = new FileInfo(arguments[0]);
-                SetImage(Image.FromFile(fileInfo.FullName), fileInfo.Name);
-            }
-            catch (Exception)
-            {
-                return;
-            }
+            var imageInfo = ImageInfo.LoadFromFile(arguments[0]);
+            ImageLoaded = true;
+            DisplayImage(imageInfo);
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs keyEventArgs)
@@ -54,15 +48,16 @@ namespace ImageViewer
             ImageHolder.Size = Size;
         }
 
-        private void SetImage(Image image, string name)
+        private void DisplayImage(ImageInfo imageInfo)
         {
-            ImageHolder.Image = image;
-            ImageNameBox.Text = name;
+            ImageHolder.Image = imageInfo.Picture;
+            ImageNameBox.Text = imageInfo.Name;
             ImageHolder.SizeMode = PictureBoxSizeMode.Zoom; // scale image to fit box
 
-            var zoom = ((image.Width > image.Height) ? ((float)image.Width / Width) : ((float)image.Height / Height)) * 100;
-
+            var zoom = imageInfo.GetZoomPercentage(ImageHolder.Size);
             StatusMessagesBox.Text = String.Format("{0:0}%", zoom);
+
+            BackColor = imageInfo.EdgeColour;
             
             ImageHolder.Refresh();
         }
