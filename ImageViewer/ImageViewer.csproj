@@ -86,6 +86,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="SampleImages\apples1jpeg.jpg" />
+    <Content Include="SampleImages\apples2jpeg.jpg" />
+    <Content Include="SampleImages\apples3jpeg.jpg" />
+    <Content Include="SampleImages\apples4jpeg.jpg" />
+    <Content Include="SampleImages\apples5png.png" />
     <Content Include="ToDo.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
