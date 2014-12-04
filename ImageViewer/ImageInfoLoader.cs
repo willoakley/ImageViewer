@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Reflection;
 
 namespace ImageViewer
 {
@@ -12,7 +14,7 @@ namespace ImageViewer
         {
             var image = Image.FromFile(imageFileSystemInfo.FullName);
 
-            return new ImageInfo(image, imageFileSystemInfo.Name, imageFileSystemInfo.FullName);
+            return new ImageInfo(image, imageFileSystemInfo.Name, imageFileSystemInfo.FullName, imageFileSystemInfo.LastWriteTimeUtc);
         }
 
         public ImageInfo FromFile(string relativePath)
@@ -20,12 +22,25 @@ namespace ImageViewer
             var fileInfo = new FileInfo(relativePath);
             var image = Image.FromFile(relativePath);
 
-            return new ImageInfo(image, fileInfo.Name, relativePath);
+            return new ImageInfo(image, fileInfo.Name, relativePath, fileInfo.LastWriteTimeUtc);
         }
 
         public ImageInfo FromImage(Image image, string name)
         {
-            return new ImageInfo(image, name, string.Empty);
+            return new ImageInfo(image, name, string.Empty, DateTime.UtcNow);
+        }
+
+        public ImageInfo LoadingImage()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            Image image;
+
+            using (var file = assembly.GetManifestResourceStream("ImageViewer.spinner.gif"))
+            {
+                image = Image.FromStream(file);
+            }
+
+            return new ImageInfo(image, "loading", string.Empty, DateTime.UtcNow);
         }
 
         public List<FileSystemInfo> ListImagePaths(string relativePath)
@@ -39,9 +54,10 @@ namespace ImageViewer
 
             var allImages = new List<FileSystemInfo>();
 
-            foreach (var type in ValidFileExtensions)
+            // Not worth making each of these its own thread as it actually takes longer
+            foreach (var extension in ValidFileExtensions)
             {
-                allImages.AddRange(directory.GetFiles(type, SearchOption.TopDirectoryOnly));
+                allImages.AddRange(directory.GetFiles(extension, SearchOption.TopDirectoryOnly));
             }
 
             return allImages;

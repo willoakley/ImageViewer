@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -8,6 +9,7 @@ namespace ImageViewer
     {
         private readonly Task<ImageInfo> loadInitialImage;
         private ImageInfo initialImage;
+        private readonly ImageInfo loadingSpinner;
 
         public MainForm(string[] arguments)
         {
@@ -17,8 +19,10 @@ namespace ImageViewer
             }
 
             loadInitialImage = Task.Factory.StartNew(() => new ImageInfoLoader().FromFile(arguments[0]));
+            loadingSpinner = new ImageInfoLoader().LoadingImage();
 
             InitializeComponent();
+            ImageHolder.Image = loadingSpinner.Picture;
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs keyEventArgs)
@@ -55,8 +59,12 @@ namespace ImageViewer
             initialImage = loadInitialImage.Result;
             DisplayImage(initialImage);
 
+            var stop = new Stopwatch();
+            stop.Start();
             var allImages = new ImageInfoLoader().ListImagePaths(initialImage.RelativePath);
-            StatusMessagesBox.Text += string.Format(" {0} images", allImages.Count);
+            stop.Stop();
+
+            StatusMessagesBox.Text += string.Format(" {0} images in {1}ms", allImages.Count, stop.ElapsedMilliseconds);
         }
 
         private void DisplayImage(ImageInfo imageInfo)
@@ -69,8 +77,12 @@ namespace ImageViewer
             StatusMessagesBox.Text = String.Format("{0:0}%", zoom);
 
             BackColor = imageInfo.EdgeColour;
+            StatusMessagesBox.BackColor = imageInfo.EdgeColour;
+            ImageNameBox.BackColor = imageInfo.EdgeColour;
             
             ImageHolder.Refresh();
+            StatusMessagesBox.Refresh();
+            ImageNameBox.Refresh();
         }
 
         private static void Quit()

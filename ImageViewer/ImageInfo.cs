@@ -1,11 +1,13 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace ImageViewer
 {
     public class ImageInfo
     {
-        public ImageInfo(Image image, string name, string relativePath)
+        public ImageInfo(Image image, string name, string relativePath, DateTime lastModified)
         {
+            LastModified = lastModified;
             Picture = image;
             Name = string.IsNullOrWhiteSpace(name) ? "noname" : name.Trim();
             RelativePath = relativePath;
@@ -18,6 +20,7 @@ namespace ImageViewer
         public string Name { get; private set; }
         public string RelativePath { get; private set; }
         public Color EdgeColour { get; private set; }
+        public DateTime LastModified { get; private set; }
 
 
         public int GetZoomPercentage(Size sizeLimit)
