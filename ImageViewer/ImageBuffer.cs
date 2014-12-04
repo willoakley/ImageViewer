@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace ImageViewer
@@ -24,9 +25,12 @@ namespace ImageViewer
             return Images.Count;
         }
 
-        public void Load(string directoryPath)
+        public void Load(string initialImagePath)
         {
-            var paths = Loader.ListImagePaths(directoryPath).OrderBy(x => x.LastWriteTime);
+            // Use later for selecting initial image to buffer from
+            var imageName = Path.GetFileName(initialImagePath);
+
+            var paths = Loader.ListImagePaths(initialImagePath).OrderBy(x => x.LastWriteTime);
             Images = new List<ImageInfo>(paths.Select(x => LoadingImage));
         }
     }
