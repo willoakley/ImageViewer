@@ -91,7 +91,9 @@
     <Content Include="SampleImages\apples3jpeg.jpg" />
     <Content Include="SampleImages\apples4jpeg.jpg" />
     <Content Include="SampleImages\apples5png.png" />
-    <EmbeddedResource Include="spinner.gif" />
+    <Content Include="spinner.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ToDo.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

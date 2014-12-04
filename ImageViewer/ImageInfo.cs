@@ -5,8 +5,9 @@ namespace ImageViewer
 {
     public class ImageInfo
     {
-        public ImageInfo(Image image, string name, string relativePath, DateTime lastModified)
+        public ImageInfo(Image image, string name, string relativePath, DateTime lastModified, bool neverResize = false)
         {
+            NeverResize = neverResize;
             LastModified = lastModified;
             Picture = image;
             Name = string.IsNullOrWhiteSpace(name) ? "noname" : name.Trim();
@@ -17,6 +18,7 @@ namespace ImageViewer
 
 
         public Image Picture { get; private set; }
+        public bool NeverResize { get; private set; }
         public string Name { get; private set; }
         public string RelativePath { get; private set; }
         public Color EdgeColour { get; private set; }
@@ -28,6 +30,11 @@ namespace ImageViewer
             if (Picture == null)
             {
                 return 0;
+            }
+
+            if (NeverResize)
+            {
+                return 100;
             }
 
             var scalledDecimal = (IsWider ? ((float)sizeLimit.Width / Picture.Width) : ((float)sizeLimit.Height / Picture.Height));

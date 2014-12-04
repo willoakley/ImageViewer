@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Reflection;
 
 namespace ImageViewer
 {
@@ -32,15 +31,10 @@ namespace ImageViewer
 
         public ImageInfo LoadingImage()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            Image image;
+            const bool neverResize = true;
 
-            using (var file = assembly.GetManifestResourceStream("ImageViewer.spinner.gif"))
-            {
-                image = Image.FromStream(file);
-            }
-
-            return new ImageInfo(image, "loading", string.Empty, DateTime.UtcNow);
+            var filename = Path.Combine(Directory.GetCurrentDirectory(), "spinner.gif");
+            return new ImageInfo(Image.FromFile(filename), "loading", string.Empty, DateTime.UtcNow, neverResize);
         }
 
         public List<FileSystemInfo> ListImagePaths(string relativePath)
