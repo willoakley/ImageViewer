@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -7,9 +6,8 @@ namespace ImageViewer
 {
     public partial class MainForm : Form
     {
-        private readonly Task<ImageInfo> loadInitialImage;
-        private ImageInfo initialImage;
-        private readonly ImageInfo loadingSpinner;
+        private readonly Task taskImageBufferLoad;
+        private readonly ImageBuffer imageBuffer;
 
         public MainForm(string[] arguments)
         {
@@ -18,11 +16,12 @@ namespace ImageViewer
                 return;
             }
 
-            loadInitialImage = Task.Factory.StartNew(() => new ImageInfoLoader().FromFile(arguments[0]));
-            loadingSpinner = new ImageInfoLoader().LoadingImage();
+            imageBuffer = new ImageBuffer(new ImageInfoLoader());
+
+            taskImageBufferLoad = Task.Factory.StartNew(() => imageBuffer.Load(arguments[0]));
 
             InitializeComponent();
-            ImageHolder.Image = loadingSpinner.Picture;
+            ImageHolder.Image = imageBuffer.LoadingImage.Picture;
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs keyEventArgs)
@@ -51,27 +50,22 @@ namespace ImageViewer
         {
             ImageHolder.Size = Size;
 
-            if (loadInitialImage.IsFaulted)
+            if (taskImageBufferLoad.IsFaulted)
             {
                 Quit();
             }
 
-            initialImage = loadInitialImage.Result;
-            DisplayImage(initialImage);
+            taskImageBufferLoad.Wait();
+            DisplayImage(imageBuffer.Images[0]);
 
-            var stop = new Stopwatch();
-            stop.Start();
-            var allImages = new ImageInfoLoader().ListImagePaths(initialImage.RelativePath);
-            stop.Stop();
-
-            StatusMessagesBox.Text += string.Format(" {0} images in {1}ms", allImages.Count, stop.ElapsedMilliseconds);
+            StatusMessagesBox.Text += string.Format(" {0} images", imageBuffer.Count());
         }
 
         private void DisplayImage(ImageInfo imageInfo)
         {
             ImageHolder.Image = imageInfo.Picture;
             ImageNameBox.Text = imageInfo.Name;
-            ImageHolder.SizeMode = PictureBoxSizeMode.Zoom; // scale image to fit box
+            ImageHolder.SizeMode = imageInfo.NeverResize ? PictureBoxSizeMode.CenterImage : PictureBoxSizeMode.Zoom; // scale image to fit box
 
             var zoom = imageInfo.GetZoomPercentage(ImageHolder.Size);
             StatusMessagesBox.Text = String.Format("{0:0}%", zoom);
