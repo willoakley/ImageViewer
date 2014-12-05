@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Reflection;
 
 namespace ImageViewer
 {
@@ -33,7 +34,7 @@ namespace ImageViewer
         {
             const bool neverResize = true;
 
-            var filename = Path.Combine(Directory.GetCurrentDirectory(), "spinner.gif");
+            var filename = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "spinner.gif");
             return new ImageInfo(Image.FromFile(filename), "loading", string.Empty, DateTime.UtcNow, neverResize);
         }
 
