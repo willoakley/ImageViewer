@@ -122,7 +122,7 @@ namespace ImageViewer
                 return pos % Images.Count;
             }
 
-            var lowerPos = Images.Count + pos; // pos < 0
+            var lowerPos = Images.Count + pos; // pos is negative
             return lowerPos < 0 ? 0 : lowerPos;
         }
     }
