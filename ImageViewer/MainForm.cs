@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -31,18 +33,37 @@ namespace ImageViewer
                 case Keys.Escape:
                 {
                     Quit();
-                    return;
+                    break;
                 }
                 case Keys.Back:
                 {
                     Quit();
-                    return;
+                    break;
                 }
+                case Keys.Left:
+                {
+                    imageBuffer.Previous();
+                    DisplayImage(imageBuffer.CurrentImage());
+                    break;
+                }
+                case Keys.Right:
+                {
+                    imageBuffer.Next();
+                    DisplayImage(imageBuffer.CurrentImage());
+                    break;
+                }
+                case Keys.Shift:
+                {
+                    // cycle zoom mode
+                    break;
+                }
+#if DEBUG
                 default:
                 {
                     MessageBox.Show(string.Concat("No event for ", keyEventArgs.KeyCode));
                     break;
                 }
+#endif
             }
         }
 
@@ -56,7 +77,7 @@ namespace ImageViewer
             }
 
             taskImageBufferLoad.Wait();
-            DisplayImage(imageBuffer.Images[0]);
+            DisplayImage(imageBuffer.CurrentImage());
 
             StatusMessagesBox.Text += string.Format(" {0} images", imageBuffer.Count());
         }
@@ -64,15 +85,18 @@ namespace ImageViewer
         private void DisplayImage(ImageInfo imageInfo)
         {
             ImageHolder.Image = imageInfo.Picture;
-            ImageNameBox.Text = imageInfo.Name;
+            ImageNameBox.Text = Squish(imageInfo.Name);
             ImageHolder.SizeMode = imageInfo.NeverResize ? PictureBoxSizeMode.CenterImage : PictureBoxSizeMode.Zoom; // scale image to fit box
 
             var zoom = imageInfo.GetZoomPercentage(ImageHolder.Size);
-            StatusMessagesBox.Text = String.Format("{0:0}%", zoom);
+            StatusMessagesBox.Text = String.Format("{1} of {2} at {0:0}%", zoom, imageBuffer.CurrentIndex(), imageBuffer.Count());
 
             BackColor = imageInfo.EdgeColour;
             StatusMessagesBox.BackColor = imageInfo.EdgeColour;
             ImageNameBox.BackColor = imageInfo.EdgeColour;
+            var contrast = ContrastingColor(imageInfo.EdgeColour);
+            StatusMessagesBox.ForeColor = contrast;
+            ImageNameBox.ForeColor = contrast;
             
             ImageHolder.Refresh();
             StatusMessagesBox.Refresh();
@@ -82,6 +106,19 @@ namespace ImageViewer
         private static void Quit()
         {
             Application.Exit();
+        }
+
+        private static Color ContrastingColor(Color color)
+        {
+            // Counting the perceptive luminance - human eye favors green color. Adapted from http://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color  
+            var a = 1 - (0.299 * color.R + 0.587 * color.G + 0.114 * color.B) / 255;
+            return (a < 0.5) ? Color.Gray : Color.LightGray;
+        }
+
+        private static string Squish(string text)
+        {
+            const int chunk = 35;
+            return text.Length < chunk * 3 ? text : string.Concat(text.Substring(0, chunk), "...", text.Substring(text.Length - chunk));
         }
     }
 }
