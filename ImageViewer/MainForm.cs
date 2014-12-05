@@ -12,7 +12,7 @@ namespace ImageViewer
 
         public MainForm(string[] arguments)
         {
-            if (arguments == null || string.IsNullOrEmpty(arguments[0]))
+            if (arguments == null || arguments.Length == 0 || string.IsNullOrEmpty(arguments[0]))
             {
                 return;
             }
