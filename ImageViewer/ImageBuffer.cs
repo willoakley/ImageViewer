@@ -10,6 +10,8 @@ namespace ImageViewer
     {
         public List<ImageInfo> Images { get; private set; }
 
+        public event EventHandler<int> ImageLoaded;
+
         private ImageInfoLoader Loader { get; set; }
         private Task[] loadingTasks;
         private int index;
@@ -27,6 +29,7 @@ namespace ImageViewer
             index = -1;
 
             LoadingImage = Loader.LoadingImage();
+            ImageLoaded += (sender, e) => { }; // register dummy handler
         }
 
         public int Count()
@@ -107,7 +110,10 @@ namespace ImageViewer
         {
             Images[pos] = Loader.FromFile(paths[pos]);
 
-            // todo Fire event with pos that image has been updated
+            if (ImageLoaded != null)
+            {
+                ImageLoaded(this, pos);
+            }
         }
 
         private int Normalise(int pos)

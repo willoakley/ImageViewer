@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -19,11 +18,22 @@ namespace ImageViewer
             }
 
             imageBuffer = new ImageBuffer(new ImageInfoLoader());
+            imageBuffer.ImageLoaded += ImageBuffer_ImageLoaded;
 
             taskImageBufferLoad = Task.Factory.StartNew(() => imageBuffer.Load(arguments[0]));
 
             InitializeComponent();
             ImageHolder.Image = imageBuffer.LoadingImage.Picture;
+        }
+
+        private void ImageBuffer_ImageLoaded(object sender, int loadedImageIndex)
+        {
+            if (imageBuffer.CurrentIndex() != loadedImageIndex)
+            {
+                return;
+            }
+
+            Invoke(new Action(() => { DisplayImage(imageBuffer.CurrentImage()); }));
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs keyEventArgs)
