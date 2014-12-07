@@ -9,6 +9,7 @@ namespace ImageViewer
     {
         private readonly Task taskImageBufferLoad;
         private readonly ImageBuffer imageBuffer;
+        private bool inActualSizeMode;
 
         public MainForm(string[] arguments)
         {
@@ -53,18 +54,21 @@ namespace ImageViewer
                 case Keys.Left:
                 {
                     imageBuffer.Previous();
+                    inActualSizeMode = false;
                     DisplayImage(imageBuffer.CurrentImage());
                     break;
                 }
                 case Keys.Right:
                 {
                     imageBuffer.Next();
+                    inActualSizeMode = false;
                     DisplayImage(imageBuffer.CurrentImage());
                     break;
                 }
-                case Keys.Shift:
+                case Keys.ShiftKey:
                 {
-                    // cycle zoom mode
+                    inActualSizeMode = !inActualSizeMode;
+                    UpdateZoomDisplay();
                     break;
                 }
 #if DEBUG
@@ -75,6 +79,24 @@ namespace ImageViewer
                 }
 #endif
             }
+        }
+
+        private void UpdateZoomDisplay()
+        {
+            var imageInfo = imageBuffer.CurrentImage();
+
+            UpdateStatusMessageBoxText(imageInfo);
+            UpdateImageHolderSizeMode(imageInfo);
+
+            ImageHolder.Refresh();
+            StatusMessagesBox.Refresh();
+        }
+
+        private void UpdateImageHolderSizeMode(ImageInfo imageInfo)
+        {
+            ImageHolder.SizeMode = inActualSizeMode || imageInfo.NeverResize
+                ? PictureBoxSizeMode.CenterImage
+                : PictureBoxSizeMode.Zoom;
         }
 
         private void MainForm_Load(object sender, EventArgs eventArgs)
@@ -96,10 +118,9 @@ namespace ImageViewer
         {
             ImageHolder.Image = imageInfo.Picture;
             ImageNameBox.Text = Squish(imageInfo.Name);
-            ImageHolder.SizeMode = imageInfo.NeverResize ? PictureBoxSizeMode.CenterImage : PictureBoxSizeMode.Zoom; // scale image to fit box
 
-            var zoom = imageInfo.GetZoomPercentage(ImageHolder.Size);
-            StatusMessagesBox.Text = String.Format("{1} of {2} at {0:0}%", zoom, imageBuffer.CurrentIndex(), imageBuffer.Count());
+            UpdateImageHolderSizeMode(imageInfo);
+            UpdateStatusMessageBoxText(imageInfo);
 
             BackColor = imageInfo.EdgeColour;
             StatusMessagesBox.BackColor = imageInfo.EdgeColour;
@@ -111,6 +132,12 @@ namespace ImageViewer
             ImageHolder.Refresh();
             StatusMessagesBox.Refresh();
             ImageNameBox.Refresh();
+        }
+
+        private void UpdateStatusMessageBoxText(ImageInfo imageInfo)
+        {
+            var zoom = inActualSizeMode ? 100 : imageInfo.GetZoomPercentage(ImageHolder.Size);
+            StatusMessagesBox.Text = String.Format("{1} of {2} at {0:0}%", zoom, imageBuffer.CurrentIndex(), imageBuffer.Count());
         }
 
         private static void Quit()
