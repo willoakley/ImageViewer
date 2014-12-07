@@ -18,6 +18,7 @@ namespace ImageViewer
 
         private const int BufferLowerOffset = -2;
         private const int BufferUpperOffset = 5;
+        private const int BufferSize = BufferUpperOffset - BufferLowerOffset;
 
         public readonly ImageInfo LoadingImage;
         private List<string> paths;
@@ -48,8 +49,6 @@ namespace ImageViewer
 
             loadingTasks = new Task[Images.Count];
 
-            AddLoadImage(index); // Selected image first
-
             AddToBuffer();
         }
 
@@ -79,6 +78,8 @@ namespace ImageViewer
 
         private void AddToBuffer()
         {
+            AddLoadImage(index); // Selected image first
+
             for (var pos = index + 1; pos < index + BufferUpperOffset; pos++)
             {
                 AddLoadImage(Normalise(pos));
@@ -92,6 +93,12 @@ namespace ImageViewer
 
         private void RemoveLoadImage(int pos)
         {
+            // If there are fewer images in the location than should be buffered, don't remove them
+            if (paths.Count <= BufferSize)
+            {
+                return;
+            }
+
             Images[pos] = LoadingImage;
             loadingTasks[pos] = null;
         }

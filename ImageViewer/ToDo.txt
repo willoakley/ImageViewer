@@ -2,7 +2,6 @@
 TODO:
 ---------------------------------------------------------------------------------------------------------
 
-Fix issue with displaying three or fewer files and navigating backwards
 Shift key to toggle between zoom and actual size (update zoom display)
 Arrow keys in actual-size mode to move image about
 
