@@ -21,9 +21,9 @@ namespace ImageViewer
             imageBuffer = new ImageBuffer(new ImageInfoLoader());
             imageBuffer.ImageLoaded += ImageBuffer_ImageLoaded;
 
-            taskImageBufferLoad = Task.Factory.StartNew(() => imageBuffer.Load(arguments[0]));
-
             InitializeComponent();
+
+            taskImageBufferLoad = Task.Factory.StartNew(() => imageBuffer.Load(arguments[0]));
             ImageHolder.Image = imageBuffer.LoadingImage.Picture;
         }
 
