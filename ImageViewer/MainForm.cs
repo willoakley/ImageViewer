@@ -11,6 +11,14 @@ namespace ImageViewer
         private readonly ImageBuffer imageBuffer;
         private bool inActualSizeMode;
 
+        private enum Direction
+        {
+            Up,
+            Down,
+            Left,
+            Right
+        }
+
         public MainForm(string[] arguments)
         {
             if (arguments == null || arguments.Length == 0 || string.IsNullOrEmpty(arguments[0]))
@@ -53,21 +61,54 @@ namespace ImageViewer
                 }
                 case Keys.Left:
                 {
+                    if (inActualSizeMode)
+                    {
+                        MoveImageHolder(Direction.Left);
+                        break;
+                    }
+
                     imageBuffer.Previous();
                     inActualSizeMode = false;
+                    ImageHolder.Location = new Point(0, 0);
                     DisplayImage(imageBuffer.CurrentImage());
                     break;
                 }
                 case Keys.Right:
                 {
+                    if (inActualSizeMode)
+                    {
+                        MoveImageHolder(Direction.Right);
+                        break;
+                    }
+
                     imageBuffer.Next();
                     inActualSizeMode = false;
+                    ImageHolder.Location = new Point(0, 0);
                     DisplayImage(imageBuffer.CurrentImage());
+                    break;
+                }
+                case Keys.Up:
+                {
+                    if (inActualSizeMode)
+                    {
+                        MoveImageHolder(Direction.Up);
+                    }
+
+                    break;
+                }
+                case Keys.Down:
+                {
+                    if (inActualSizeMode)
+                    {
+                        MoveImageHolder(Direction.Down);
+                    }
+
                     break;
                 }
                 case Keys.ShiftKey:
                 {
                     inActualSizeMode = !inActualSizeMode;
+                    ImageHolder.Location = new Point(0, 0);
                     UpdateZoomDisplay();
                     break;
                 }
@@ -79,6 +120,38 @@ namespace ImageViewer
                 }
 #endif
             }
+        }
+
+        private void MoveImageHolder(Direction direction)
+        {
+            var horisontalShift = imageBuffer.CurrentImage().Picture.Width / 20;
+            var verticalShift = imageBuffer.CurrentImage().Picture.Height / 20;
+
+            switch (direction)
+            {
+                case Direction.Up:
+                {
+                    ImageHolder.Location = new Point(ImageHolder.Location.X, ImageHolder.Location.Y - verticalShift);
+                    break;
+                }
+                case Direction.Down:
+                {
+                    ImageHolder.Location = new Point(ImageHolder.Location.X, ImageHolder.Location.Y + verticalShift);
+                    break;
+                }
+                case Direction.Left:
+                {
+                    ImageHolder.Location = new Point(ImageHolder.Location.X - horisontalShift, ImageHolder.Location.Y);
+                    break;
+                }
+                case Direction.Right:
+                {
+                    ImageHolder.Location = new Point(ImageHolder.Location.X + horisontalShift, ImageHolder.Location.Y);
+                    break;
+                }
+            }
+
+            ImageHolder.Refresh();
         }
 
         private void UpdateZoomDisplay()
