@@ -28,10 +28,11 @@ namespace ImageViewer
 
             imageBuffer = new ImageBuffer(new ImageInfoLoader());
             imageBuffer.ImageLoaded += ImageBuffer_ImageLoaded;
-
+            
             InitializeComponent();
 
             taskImageBufferLoad = Task.Factory.StartNew(() => imageBuffer.Load(arguments[0]));
+
             ImageHolder.Image = imageBuffer.LoadingImage.Picture;
         }
 
@@ -42,7 +43,7 @@ namespace ImageViewer
                 return;
             }
 
-            Invoke(new Action(() => { DisplayImage(imageBuffer.CurrentImage()); }));
+            Invoke(new Action(() => { System.Threading.Thread.Sleep(50); DisplayImage(imageBuffer.CurrentImage()); }));
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs keyEventArgs)
@@ -52,40 +53,40 @@ namespace ImageViewer
                 case Keys.Escape:
                 {
                     Quit();
-                    break;
+                    return;
                 }
                 case Keys.Back:
                 {
                     Quit();
-                    break;
+                    return;
                 }
                 case Keys.Left:
                 {
                     if (inActualSizeMode)
                     {
                         MoveImageHolder(Direction.Left);
-                        break;
+                        return;
                     }
 
                     imageBuffer.Previous();
                     inActualSizeMode = false;
                     ImageHolder.Location = new Point(0, 0);
                     DisplayImage(imageBuffer.CurrentImage());
-                    break;
+                    return;
                 }
                 case Keys.Right:
                 {
                     if (inActualSizeMode)
                     {
                         MoveImageHolder(Direction.Right);
-                        break;
+                        return;
                     }
 
                     imageBuffer.Next();
                     inActualSizeMode = false;
                     ImageHolder.Location = new Point(0, 0);
                     DisplayImage(imageBuffer.CurrentImage());
-                    break;
+                    return;
                 }
                 case Keys.Up:
                 {
@@ -94,7 +95,7 @@ namespace ImageViewer
                         MoveImageHolder(Direction.Up);
                     }
 
-                    break;
+                    return;
                 }
                 case Keys.Down:
                 {
@@ -103,20 +104,30 @@ namespace ImageViewer
                         MoveImageHolder(Direction.Down);
                     }
 
-                    break;
+                    return;
                 }
                 case Keys.ShiftKey:
                 {
                     inActualSizeMode = !inActualSizeMode;
                     ImageHolder.Location = new Point(0, 0);
                     UpdateZoomDisplay();
-                    break;
+                    return;
+                }
+                case Keys.F5:
+                {
+                    if (imageBuffer.CurrentImage() == imageBuffer.LoadingImage)
+                    {
+                        imageBuffer.ReloadCurrentImageFromDisk();
+                    }
+
+                    DisplayImage(imageBuffer.CurrentImage());
+                    return;
                 }
 #if DEBUG
                 default:
                 {
                     MessageBox.Show(string.Concat("No event for ", keyEventArgs.KeyCode));
-                    break;
+                    return;
                 }
 #endif
             }

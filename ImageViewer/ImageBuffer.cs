@@ -138,5 +138,11 @@ namespace ImageViewer
             var lowerPos = Images.Count + pos; // pos is negative
             return lowerPos < 0 ? 0 : lowerPos;
         }
+
+        public void ReloadCurrentImageFromDisk()
+        {
+            loadingTasks[index] = null;
+            LoadImage(index);
+        }
     }
 }
