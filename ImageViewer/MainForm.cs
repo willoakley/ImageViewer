@@ -10,6 +10,7 @@ namespace ImageViewer
         private readonly Task taskImageBufferLoad;
         private readonly ImageBuffer imageBuffer;
         private bool inActualSizeMode;
+        private readonly Timer imageStillUnloadedTimer;
 
         private enum Direction
         {
@@ -28,10 +29,27 @@ namespace ImageViewer
 
             imageBuffer = new ImageBuffer(new ImageInfoLoader());
             imageBuffer.ImageLoaded += ImageBuffer_ImageLoaded;
+            imageStillUnloadedTimer = new Timer { Interval = 200 };
+            imageStillUnloadedTimer.Tick += (sender, e) =>
+                                                            {
+                                                                imageStillUnloadedTimer.Stop();
+                                                                if (ImageNameBox.Text != Squish(imageBuffer.LoadingImage.Name))
+                                                                {
+                                                                    return;
+                                                                }
+
+                                                                if (imageBuffer.CurrentImage() == imageBuffer.LoadingImage)
+                                                                {
+                                                                    imageBuffer.ReloadCurrentImageFromDisk();
+                                                                }
+
+                                                                DisplayImage(imageBuffer.CurrentImage());
+                                                            };
             
             InitializeComponent();
 
             taskImageBufferLoad = Task.Factory.StartNew(() => imageBuffer.Load(arguments[0]));
+            imageStillUnloadedTimer.Start();
 
             ImageHolder.Image = imageBuffer.LoadingImage.Picture;
         }
