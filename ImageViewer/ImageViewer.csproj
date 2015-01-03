@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="ColourIndex.cs" />
     <Compile Include="ImageBuffer.cs" />
+    <Compile Include="ImageBufferImageInfo.cs" />
     <Compile Include="ImageExtensions.cs" />
     <Compile Include="ImageInfo.cs" />
     <Compile Include="ImageInfoLoader.cs" />

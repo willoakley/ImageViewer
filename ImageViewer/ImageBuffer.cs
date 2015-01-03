@@ -8,12 +8,11 @@ namespace ImageViewer
 {
     internal class ImageBuffer
     {
-        public List<ImageInfo> Images { get; private set; }
+        public List<ImageBufferImageInfo> Images { get; private set; }
 
         public event EventHandler<int> ImageLoaded;
 
         private ImageInfoLoader Loader { get; set; }
-        private Task[] loadingTasks;
         private int index;
 
         private const int BufferLowerOffset = -2;
@@ -26,7 +25,7 @@ namespace ImageViewer
         public ImageBuffer(ImageInfoLoader loader)
         {
             Loader = loader;
-            Images = new List<ImageInfo>();
+            Images = new List<ImageBufferImageInfo>();
             index = -1;
 
             LoadingImage = Loader.LoadingImage();
@@ -45,16 +44,14 @@ namespace ImageViewer
 
             paths = Loader.ListImagePaths(imageName).OrderBy(x => x.LastWriteTime).Select(s => s.FullName).ToList();
             index = paths.FindIndex(n => string.Equals(n, imageName, StringComparison.InvariantCultureIgnoreCase));
-            Images = new List<ImageInfo>(paths.Select(x => LoadingImage));
-
-            loadingTasks = new Task[Images.Count];
+            Images = new List<ImageBufferImageInfo>(paths.Select(x => new ImageBufferImageInfo { ImageInfo = LoadingImage }));
 
             AddToBuffer();
         }
 
         public ImageInfo CurrentImage()
         {
-            return Images[index];
+            return Images[index].ImageInfo;
         }
 
         public int CurrentIndex()
@@ -99,23 +96,23 @@ namespace ImageViewer
                 return;
             }
 
-            Images[pos] = LoadingImage;
-            loadingTasks[pos] = null;
+            Images[pos].ImageInfo = LoadingImage;
+            Images[pos].Task = null;
         }
 
         private void AddLoadImage(int pos)
         {
-            if (loadingTasks[pos] != null)
+            if (Images[pos].Task != null)
             {
                 return;
             }
 
-            loadingTasks[pos] = Task.Factory.StartNew(() => LoadImage(pos));
+            Images[pos].Task = Task.Factory.StartNew(() => LoadImage(pos));
         }
 
         private void LoadImage(int pos)
         {
-            Images[pos] = Loader.FromFile(paths[pos]);
+            Images[pos].ImageInfo = Loader.FromFile(paths[pos]);
 
             if (ImageLoaded != null)
             {
@@ -141,7 +138,7 @@ namespace ImageViewer
 
         public void ReloadCurrentImageFromDisk()
         {
-            loadingTasks[index] = null;
+            Images[index].Task = null;
             LoadImage(index);
         }
     }
