@@ -55,7 +55,7 @@
             // StatusMessagesBox
             // 
             this.StatusMessagesBox.AutoSize = true;
-            this.StatusMessagesBox.Location = new System.Drawing.Point(12, 31);
+            this.StatusMessagesBox.Location = new System.Drawing.Point(12, 22);
             this.StatusMessagesBox.Name = "StatusMessagesBox";
             this.StatusMessagesBox.Size = new System.Drawing.Size(109, 13);
             this.StatusMessagesBox.TabIndex = 1;
