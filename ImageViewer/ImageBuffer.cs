@@ -73,6 +73,22 @@ namespace ImageViewer
             AddLoadImage(Normalise(index + BufferLowerOffset));
         }
 
+        public void RecycleCurrentImage(ImageInfo targetImageInfo)
+        {
+            var target = Images.FirstOrDefault(x => x.ImageInfo == targetImageInfo);
+
+            if (Count() <= 1 || target == null)
+            {
+                return;
+            }
+
+            target.Task = null;
+            target.ImageInfo.Picture.Dispose();
+
+            Loader.RecycleImage(target.ImageInfo.RelativePath);
+            Images.Remove(target);
+        }
+
         private void AddToBuffer()
         {
             AddLoadImage(index); // Selected image first

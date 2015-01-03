@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using Microsoft.VisualBasic.FileIO;
+using SearchOption = System.IO.SearchOption;
 
 namespace ImageViewer
 {
@@ -56,6 +58,16 @@ namespace ImageViewer
             }
 
             return allImages;
+        }
+
+        public void RecycleImage(string relativePath)
+        {
+            if (!FileSystem.FileExists(relativePath))
+            {
+                return;
+            }
+
+            FileSystem.DeleteFile(relativePath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin, UICancelOption.DoNothing);
         }
     }
 }

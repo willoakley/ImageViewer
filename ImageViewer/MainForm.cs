@@ -88,11 +88,7 @@ namespace ImageViewer
                         return;
                     }
 
-                    imageBuffer.Previous();
-                    inActualSizeMode = false;
-                    ImageHolder.Location = new Point(0, 0);
-                    DisplayImage(imageBuffer.CurrentImage());
-                    imageStillUnloadedTimer.Start();
+                    GoToPreviousImage();
                     return;
                 }
                 case Keys.Right:
@@ -103,11 +99,7 @@ namespace ImageViewer
                         return;
                     }
 
-                    imageBuffer.Next();
-                    inActualSizeMode = false;
-                    ImageHolder.Location = new Point(0, 0);
-                    DisplayImage(imageBuffer.CurrentImage());
-                    imageStillUnloadedTimer.Start();
+                    GoToNextImage();
                     return;
                 }
                 case Keys.Up:
@@ -144,6 +136,16 @@ namespace ImageViewer
                     DisplayImage(imageBuffer.CurrentImage());
                     return;
                 }
+                case Keys.Delete:
+                {
+                    var imageToDelete = imageBuffer.CurrentImage();
+                    GoToPreviousImage();
+                    imageBuffer.RecycleCurrentImage(imageToDelete);
+
+                    UpdateStatusMessageBoxText(imageBuffer.CurrentImage());
+                    StatusMessagesBox.Refresh();
+                    return;
+                }
 #if DEBUG
                 default:
                 {
@@ -152,6 +154,24 @@ namespace ImageViewer
                 }
 #endif
             }
+        }
+
+        private void GoToNextImage()
+        {
+            imageBuffer.Next();
+            inActualSizeMode = false;
+            ImageHolder.Location = new Point(0, 0);
+            DisplayImage(imageBuffer.CurrentImage());
+            imageStillUnloadedTimer.Start();
+        }
+
+        private void GoToPreviousImage()
+        {
+            imageBuffer.Previous();
+            inActualSizeMode = false;
+            ImageHolder.Location = new Point(0, 0);
+            DisplayImage(imageBuffer.CurrentImage());
+            imageStillUnloadedTimer.Start();
         }
 
         private void MoveImageHolder(Direction direction)
