@@ -127,7 +127,6 @@ namespace ImageViewer
                 case Keys.ShiftKey:
                 {
                     inActualSizeMode = !inActualSizeMode;
-                    ImageHolder.Location = new Point(0, 0);
                     UpdateZoomDisplay();
                     return;
                 }
@@ -153,8 +152,8 @@ namespace ImageViewer
 
         private void MoveImageHolder(Direction direction)
         {
-            var horisontalShift = imageBuffer.CurrentImage().Picture.Width / 20;
-            var verticalShift = imageBuffer.CurrentImage().Picture.Height / 20;
+            var horisontalShift = imageBuffer.CurrentImage().Picture.Width / 25;
+            var verticalShift = imageBuffer.CurrentImage().Picture.Height / 25;
 
             switch (direction)
             {
@@ -187,8 +186,8 @@ namespace ImageViewer
         {
             var imageInfo = imageBuffer.CurrentImage();
 
-            UpdateStatusMessageBoxText(imageInfo);
             UpdateImageHolderSizeMode(imageInfo);
+            UpdateStatusMessageBoxText(imageInfo);
 
             ImageHolder.Refresh();
             StatusMessagesBox.Refresh();
@@ -196,9 +195,13 @@ namespace ImageViewer
 
         private void UpdateImageHolderSizeMode(ImageInfo imageInfo)
         {
-            ImageHolder.SizeMode = inActualSizeMode || imageInfo.NeverResize
-                ? PictureBoxSizeMode.CenterImage
-                : PictureBoxSizeMode.Zoom;
+            var inFullyZoomedMode = inActualSizeMode || imageInfo.NeverResize;
+            var pictureSize = imageInfo.Picture.Size;
+            var screenCentre = new Size(Width / 2, Height / 2);
+
+            ImageHolder.SizeMode = inFullyZoomedMode ? PictureBoxSizeMode.CenterImage : PictureBoxSizeMode.Zoom;
+            ImageHolder.Location = inFullyZoomedMode ? new Point(screenCentre.Width - (pictureSize.Width / 2), screenCentre.Height - (pictureSize.Height / 2)) : new Point(0, 0);
+            ImageHolder.Size = inFullyZoomedMode ? imageInfo.Picture.Size : Size;
         }
 
         private void MainForm_Load(object sender, EventArgs eventArgs)
@@ -238,7 +241,7 @@ namespace ImageViewer
 
         private void UpdateStatusMessageBoxText(ImageInfo imageInfo)
         {
-            var zoom = inActualSizeMode ? 100 : imageInfo.GetZoomPercentage(ImageHolder.Size);
+            var zoom = inActualSizeMode || imageInfo.NeverResize ? 100 : imageInfo.GetZoomPercentage(ImageHolder.Size);
             StatusMessagesBox.Text = String.Format("{1} of {2} at {0:0}%", zoom, imageBuffer.CurrentIndex(), imageBuffer.Count());
         }
 
