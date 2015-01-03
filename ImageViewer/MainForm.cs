@@ -30,21 +30,7 @@ namespace ImageViewer
             imageBuffer = new ImageBuffer(new ImageInfoLoader());
             imageBuffer.ImageLoaded += ImageBuffer_ImageLoaded;
             imageStillUnloadedTimer = new Timer { Interval = 200 };
-            imageStillUnloadedTimer.Tick += (sender, e) =>
-                                                            {
-                                                                imageStillUnloadedTimer.Stop();
-                                                                if (ImageNameBox.Text != Squish(imageBuffer.LoadingImage.Name))
-                                                                {
-                                                                    return;
-                                                                }
-
-                                                                if (imageBuffer.CurrentImage() == imageBuffer.LoadingImage)
-                                                                {
-                                                                    imageBuffer.ReloadCurrentImageFromDisk();
-                                                                }
-
-                                                                DisplayImage(imageBuffer.CurrentImage());
-                                                            };
+            imageStillUnloadedTimer.Tick += ImageStillUnloadedTimerTick;
             
             InitializeComponent();
 
@@ -52,6 +38,22 @@ namespace ImageViewer
             imageStillUnloadedTimer.Start();
 
             ImageHolder.Image = imageBuffer.LoadingImage.Picture;
+        }
+
+        private void ImageStillUnloadedTimerTick(object sender, EventArgs eventArgs)
+        {
+            imageStillUnloadedTimer.Stop();
+            if (ImageNameBox.Text != Squish(imageBuffer.LoadingImage.Name))
+            {
+                return;
+            }
+
+            if (imageBuffer.CurrentImage() == imageBuffer.LoadingImage)
+            {
+                imageBuffer.ReloadCurrentImageFromDisk();
+            }
+
+            DisplayImage(imageBuffer.CurrentImage());
         }
 
         private void ImageBuffer_ImageLoaded(object sender, int loadedImageIndex)
@@ -90,6 +92,7 @@ namespace ImageViewer
                     inActualSizeMode = false;
                     ImageHolder.Location = new Point(0, 0);
                     DisplayImage(imageBuffer.CurrentImage());
+                    imageStillUnloadedTimer.Start();
                     return;
                 }
                 case Keys.Right:
@@ -104,6 +107,7 @@ namespace ImageViewer
                     inActualSizeMode = false;
                     ImageHolder.Location = new Point(0, 0);
                     DisplayImage(imageBuffer.CurrentImage());
+                    imageStillUnloadedTimer.Start();
                     return;
                 }
                 case Keys.Up:
